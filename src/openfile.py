@@ -8,16 +8,19 @@ depending on the filename suffix.
 import bz2
 import gzip
 import lzma
+import os.path
 import sys
 
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 
-def openfile(filename, mode="rt", *args, **kwargs):
+def openfile(filename, mode="rt", *args, expanduser=False, **kwargs):
     """Open filename and return a corresponding file object."""
     if filename in ("-", None):
         return sys.stdin if "r" in mode else sys.stdout
+    if expanduser:
+        filename = os.path.expanduser(filename)
     if filename.endswith(".gz"):
         _open = gzip.open
     elif filename.endswith(".bz2"):
