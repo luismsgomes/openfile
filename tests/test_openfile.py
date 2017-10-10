@@ -1,6 +1,8 @@
+import os
 import os.path
-from openfile import openfile
 import sys
+import pytest
+from openfile import openfile
 
 
 def test_openfile(tmpdir):
@@ -17,3 +19,15 @@ def test_openfile(tmpdir):
     assert openfile("-", "rt") is sys.stdin
     assert openfile("-", "wt") is sys.stdout
     assert openfile("-", "at") is sys.stdout
+
+
+def test_openfile_expand():
+    with pytest.raises(IsADirectoryError):
+        with openfile("~/", "rb", expanduser=True) as f:
+            pass
+    home = os.path.expanduser("~")
+    os.environ["HOME"] = home
+    if os.getenv("HOME", None) == home:
+        with pytest.raises(IsADirectoryError):
+            with openfile("${HOME}", "rb", expandvars=True) as f:
+                pass
