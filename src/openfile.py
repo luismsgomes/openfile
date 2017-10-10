@@ -12,11 +12,11 @@ import os.path
 import sys
 
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 
 
 def openfile(filename, mode="rt", *args, expanduser=False, expandvars=False,
-             **kwargs):
+             makedirs=False, **kwargs):
     """Open filename and return a corresponding file object."""
     if filename in ("-", None):
         return sys.stdin if "r" in mode else sys.stdout
@@ -24,6 +24,10 @@ def openfile(filename, mode="rt", *args, expanduser=False, expandvars=False,
         filename = os.path.expanduser(filename)
     if expandvars:
         filename = os.path.expandvars(filename)
+    if makedirs and ("a" in mode or "w" in mode):
+        parentdir = os.path.dirname(filename)
+        if not os.path.isdir(parentdir):
+            os.makedirs(parentdir)
     if filename.endswith(".gz"):
         _open = gzip.open
     elif filename.endswith(".bz2"):
