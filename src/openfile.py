@@ -5,14 +5,26 @@ work to ``gzip.open()``, ``bz2.open()``, ``lzma.open()`` or ``open()``,
 depending on the filename suffix.
 """
 
-import bz2
-import gzip
-import lzma
+try:
+    import bz2
+except ImportError:
+    bz2 = None
+
+try:
+    import gzip
+except ImportError:
+    gzip = None
+
+try:
+    import lzma
+except ImportError:
+    lzma = None
+
 import os.path
 import sys
 
 
-__version__ = "0.0.6"
+__version__ = "0.0.7"
 
 
 def openfile(filename, mode="rt", *args, expanduser=False, expandvars=False,
@@ -29,10 +41,16 @@ def openfile(filename, mode="rt", *args, expanduser=False, expandvars=False,
         if not os.path.isdir(parentdir):
             os.makedirs(parentdir)
     if filename.endswith(".gz"):
+        if gzip is None:
+            raise NotImplementedError
         _open = gzip.open
     elif filename.endswith(".bz2"):
+        if bz2 is None:
+            raise NotImplementedError
         _open = bz2.open
     elif filename.endswith(".xz") or filename.endswith(".lzma"):
+        if lzma is None:
+            raise NotImplementedError
         _open = lzma.open
     else:
         _open = open
